@@ -1,0 +1,63 @@
+<div class='container px-5 px-sm-0'>
+  <div class='row'>
+    <div class='col-md-5 offset-md-4'>
+      <% if user_signed_in? %>
+        <div class="search_form">
+          <%= form_with url: search_path, local: true, method: :get do |f| %>
+            <%= f.text_field :word %>
+            <%= f.select :range, options_for_select([['User'], ['Book']]) %>
+            <%= f.select :search, options_for_select([["完全一致","perfect_match"], ["前方一致","forward_match"],  ["後方一致","backward_match"], ["部分一致","partial_match"]]) %>
+            <%= f.submit "検索" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<table class="table table-hover table-inverse">
+  <!--検索対象モデルがUserの時 -->
+  <% if @range == "User" %>
+    <tbody>
+      <% @users.each do |user| %>
+        <h2>Users search for "<%= @word %>"</h2>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Introduction</th>
+            <th colspan="3"></th>
+          </tr>
+        </thead>
+        <tr>
+          <td><%= image_tag user.get_profile_image, size: '50x50' %></td>
+          <td><%= link_to user.name, user, class: "user_#{user.id}" %></td>
+          <th><%= user.introduction %></th>
+        </tr>
+      <% end %>
+    </tbody>
+  <% else %>
+    <!--検索対象モデルがUserではない時(= 検索対象モデルがBookの時) -->
+    <tbody>
+      <% @books.each do |book| %>
+        <h2>Books search for "<%= @word %>"</h2>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Title</th>
+            <th>Opinion</th>
+            <th colspan="3"></th>
+          </tr>
+        </thead>
+        <tr>
+          <td><%= link_to(book.user) do %>
+            <%= image_tag book.user.get_profile_image, size:'50x50' %>
+            <% end %>
+          </td>
+          <td><%= link_to book.title, book, class: "book_#{book.id}" %></td>
+          <td><%= book.body %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  <% end %>
+</table>
